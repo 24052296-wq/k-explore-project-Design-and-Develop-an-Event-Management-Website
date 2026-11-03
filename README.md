@@ -2,8 +2,8 @@
 
 A responsive website where users can explore upcoming campus events, search and filter them, view details, and register for the ones they like.
 
-**Live website:** https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
-**GitHub repository:** https://github.com/YOUR-USERNAME/YOUR-REPO-NAME
+**Live website:** https://24052296-wq.github.io/k-explore-project-Design-and-Develop-an-Event-Management-Website/
+**GitHub repository:** https://github.com/24052296-wq/k-explore-project-Design-and-Develop-an-Event-Management-Website
 
 ## Features
 
@@ -55,4 +55,4 @@ README.md
 
 ## Author
 
-YOUR NAME – K Explore Web Designing Task
+DEBASMITA SAHOO – K Explore Web Designing Task
