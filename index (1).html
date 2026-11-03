@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K Explore – Campus Events</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* ---------- Colours (change these to restyle the whole site) ---------- */
+:root{
+  --bg:#F2F5FB; --card:#FFFFFF; --ink:#14213D; --muted:#5B6785;
+  --accent:#2F5BFF; --accent-ink:#FFFFFF; --pop:#FFC93C; --line:#D9E0F0; --error:#C62828; --ok:#1B7F4B;
+}
+body.dark{
+  --bg:#0F1630; --card:#18214A; --ink:#EAF0FF; --muted:#A3AFD3;
+  --accent:#6F8DFF; --accent-ink:#0F1630; --line:#2B376B; --error:#FF8A80; --ok:#6FE3A5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;transition:background .3s,color .3s}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pop);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 20px}
+
+/* ---------- Navbar ---------- */
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-weight:800;font-size:1.25rem}
+.logo span{color:var(--accent)}
+.links{display:flex;gap:24px;align-items:center}
+.links a{font-weight:600;color:var(--muted)}
+.links a:hover{color:var(--ink)}
+.icon-btn{background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;cursor:pointer}
+.menu-btn{display:none}
+@media(max-width:700px){
+  .menu-btn{display:block}
+  .links{display:none;position:absolute;top:64px;left:0;right:0;background:var(--bg);flex-direction:column;padding:16px 20px;border-bottom:1px solid var(--line);align-items:flex-start}
+  .links.open{display:flex}
+}
+
+/* ---------- Hero ---------- */
+.hero{padding:72px 0 56px}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);line-height:1.1;font-weight:800;max-width:14em}
+.hero p{margin:20px 0 28px;color:var(--muted);max-width:36em;font-size:1.1rem}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:12px 24px;font-weight:600;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.alt{background:var(--pop);color:#14213D;margin-left:10px}
+
+/* ---------- Events ---------- */
+section{padding:48px 0}
+h2{font-size:1.8rem;margin-bottom:20px}
+.tools{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.tools input{flex:1 1 220px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:600;color:var(--muted)}
+.chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-4px);box-shadow:0 10px 24px rgba(20,33,61,.15)}
+.thumb{height:150px;display:flex;align-items:flex-end;padding:12px;background-size:cover;background-position:center}
+.tag{background:var(--pop);color:#14213D;font-weight:600;font-size:.8rem;padding:3px 10px;border-radius:999px}
+.card-body{padding:18px;display:flex;flex-direction:column;gap:6px;flex:1}
+.card h3{font-size:1.1rem}
+.meta{color:var(--muted);font-size:.9rem}
+.card-body p{font-size:.95rem;flex:1}
+.card .btn{margin-top:10px;text-align:center;padding:10px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0}
+
+/* ---------- Form ---------- */
+form{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;max-width:520px}
+.field{margin-bottom:18px}
+label{display:block;font-weight:600;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.field.bad input,.field.bad select{border-color:var(--error)}
+.err{color:var(--error);font-size:.85rem;min-height:1.2em;margin-top:4px}
+.success{display:none;margin-top:18px;padding:14px;border-radius:10px;border:1px solid var(--ok);color:var(--ok);font-weight:600}
+.reg-list{margin-top:28px;max-width:520px}
+.reg-list li{list-style:none;padding:10px 0;border-bottom:1px solid var(--line);color:var(--muted)}
+
+/* ---------- Modal ---------- */
+.overlay{position:fixed;inset:0;background:rgba(10,15,40,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.overlay.show{display:flex}
+.modal{background:var(--card);border-radius:18px;max-width:520px;width:100%;max-height:90vh;overflow:auto;animation:pop .25s ease}
+@keyframes pop{from{transform:scale(.94);opacity:0}to{transform:none;opacity:1}}
+.modal .thumb{height:180px}
+.modal-body{padding:24px}
+.count{display:flex;gap:10px;margin:14px 0}
+.count div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 12px;text-align:center;min-width:62px}
+.count b{display:block;font-size:1.3rem}
+.count small{color:var(--muted)}
+.close{float:right;background:none;border:0;font-size:1.6rem;cursor:pointer}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);text-align:center;font-size:.9rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <nav>
+      <a href="#top" class="logo">K<span>Explore</span></a>
+      <div class="links" id="links">
+        <a href="#events">Events</a>
+        <a href="#register">Register</a>
+        <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark mode">Dark mode</button>
+      </div>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">Menu</button>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <h1>Find the events worth showing up for.</h1>
+    <p>Hackathons, concerts, workshops and sports days happening on campus. Pick one, register in a minute, and get a countdown to the day.</p>
+    <a href="#events" class="btn">Browse events</a>
+    <a href="#register" class="btn alt">Register now</a>
+  </div>
+
+  <section id="events">
+    <div class="wrap">
+      <h2>Upcoming events</h2>
+      <div class="tools">
+        <input type="search" id="search" placeholder="Search by name or venue" aria-label="Search events">
+        <div class="chips" id="chips"></div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="register">
+    <div class="wrap">
+      <h2>Register for an event</h2>
+      <form id="form" novalidate>
+        <div class="field"><label for="name">Full name</label><input id="name" type="text" autocomplete="name"><div class="err"></div></div>
+        <div class="field"><label for="email">Email address</label><input id="email" type="email" autocomplete="email"><div class="err"></div></div>
+        <div class="field"><label for="phone">Phone number</label><input id="phone" type="tel" placeholder="10 digits" autocomplete="tel"><div class="err"></div></div>
+        <div class="field"><label for="event">Event</label><select id="event"></select><div class="err"></div></div>
+        <button class="btn" type="submit">Complete registration</button>
+        <div class="success" id="success" role="status"></div>
+      </form>
+      <div class="reg-list">
+        <h3>Your registrations</h3>
+        <ul id="regList"></ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>K Explore · Web Designing task · Built with HTML, CSS and JavaScript</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="thumb" id="mThumb"></div>
+    <div class="modal-body">
+      <button class="close" id="closeBtn" aria-label="Close">&times;</button>
+      <h3 id="mTitle"></h3>
+      <p class="meta" id="mMeta"></p>
+      <div class="count" id="count"></div>
+      <p id="mDesc"></p>
+      <button class="btn" id="mReg" style="margin-top:18px">Register for this event</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- 1. Your data. Add or edit events here. ----------
+   To use a real photo, put it in an "images" folder and set img: "images/hack.jpg" */
+const events = [
+  {id:1,name:"CodeSprint Hackathon",category:"Tech",date:"2026-12-12T09:00",venue:"Main Auditorium",img:"",grad:["#2F5BFF","#7A5CFF"],desc:"A 24-hour hackathon. Form a team of up to four and build something useful for campus life."},
+  {id:2,name:"Winter Beats Live",category:"Music",date:"2026-12-19T18:00",venue:"Open Air Theatre",img:"",grad:["#FF5C8A","#FFB36B"],desc:"Student bands, a DJ set and an open mic. Bring friends and warm clothes."},
+  {id:3,name:"Intro to Web Design Workshop",category:"Workshop",date:"2027-01-08T10:30",venue:"Computer Lab 2",img:"",grad:["#17A2B8","#5EE6C0"],desc:"Build your first responsive page in three hours. No experience needed."},
+  {id:4,name:"Inter-College Football Cup",category:"Sports",date:"2027-01-16T15:00",venue:"University Ground",img:"",grad:["#1B9C5A","#A8E063"],desc:"Eight college teams, one trophy. Free entry for all students."},
+  {id:5,name:"Startup Pitch Night",category:"Tech",date:"2027-01-29T17:00",venue:"Seminar Hall B",img:"",grad:["#F29E1F","#FF6B3D"],desc:"Ten student founders pitch to a panel of mentors. Audience votes for the favourite."},
+  {id:6,name:"Poster & Photo Exhibition",category:"Art",date:"2027-02-06T11:00",venue:"Central Gallery",img:"",grad:["#9B5DE5","#F15BB5"],desc:"Walk through the best student art and photography of the year."}
+];
+
+const $ = s => document.querySelector(s);
+let category = "All", timer;
+
+/* ---------- 2. Show event cards ---------- */
+const fmt = d => new Date(d).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+const bg = e => e.img ? `url(${e.img})` : `linear-gradient(135deg,${e.grad[0]},${e.grad[1]})`;
+
+function renderChips(){
+  const cats = ["All", ...new Set(events.map(e => e.category))];
+  $("#chips").innerHTML = cats.map(c =>
+    `<button class="chip ${c===category?"active":""}" data-c="${c}">${c}</button>`).join("");
+}
+function renderCards(){
+  const q = $("#search").value.trim().toLowerCase();
+  const list = events.filter(e =>
+    (category==="All" || e.category===category) &&
+    (e.name+" "+e.venue).toLowerCase().includes(q));
+  $("#grid").innerHTML = list.length ? list.map(e => `
+    <article class="card">
+      <div class="thumb" style="background-image:${bg(e)}"><span class="tag">${e.category}</span></div>
+      <div class="card-body">
+        <h3>${e.name}</h3>
+        <div class="meta">${fmt(e.date)} · ${e.venue}</div>
+        <p>${e.desc.slice(0,80)}...</p>
+        <button class="btn" data-id="${e.id}">View details</button>
+      </div>
+    </article>`).join("") : `<p class="empty">No events match. Try another word or category.</p>`;
+}
+$("#chips").addEventListener("click", ev => {
+  if(ev.target.dataset.c){ category = ev.target.dataset.c; renderChips(); renderCards(); }
+});
+$("#search").addEventListener("input", renderCards);
+$("#grid").addEventListener("click", ev => {
+  if(ev.target.dataset.id) openModal(+ev.target.dataset.id);
+});
+
+/* ---------- 3. Details popup with countdown ---------- */
+let current = null;
+function openModal(id){
+  current = events.find(e => e.id===id);
+  $("#mThumb").style.backgroundImage = bg(current);
+  $("#mTitle").textContent = current.name;
+  $("#mMeta").textContent = `${fmt(current.date)} · ${current.venue} · ${current.category}`;
+  $("#mDesc").textContent = current.desc;
+  $("#overlay").classList.add("show");
+  tick(); clearInterval(timer); timer = setInterval(tick,1000);
+}
+function closeModal(){ $("#overlay").classList.remove("show"); clearInterval(timer); }
+function tick(){
+  let s = Math.max(0, Math.floor((new Date(current.date) - new Date())/1000));
+  const parts = [["Days",86400],["Hours",3600],["Mins",60],["Secs",1]].map(([l,n]) => {
+    const v = Math.floor(s/n); s %= n; return `<div><b>${v}</b><small>${l}</small></div>`;
+  });
+  $("#count").innerHTML = parts.join("");
+}
+$("#closeBtn").onclick = closeModal;
+$("#overlay").addEventListener("click", e => { if(e.target.id==="overlay") closeModal(); });
+document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
+$("#mReg").onclick = () => {
+  $("#event").value = current.id; closeModal();
+  $("#register").scrollIntoView(); $("#name").focus();
+};
+
+/* ---------- 4. Form validation ---------- */
+$("#event").innerHTML = `<option value="">Choose an event</option>` +
+  events.map(e => `<option value="${e.id}">${e.name}</option>`).join("");
+
+const rules = {
+  name:  v => /^[A-Za-z][A-Za-z .'-]{1,}$/.test(v.trim()) ? "" : "Enter your full name using letters only.",
+  email: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? "" : "Enter a valid email, like name@example.com.",
+  phone: v => /^[6-9]\d{9}$/.test(v.trim()) ? "" : "Enter a 10-digit mobile number starting with 6, 7, 8 or 9.",
+  event: v => v ? "" : "Choose the event you want to join."
+};
+function check(id){
+  const msg = rules[id]($("#"+id).value);
+  const box = $("#"+id).parentElement;
+  box.classList.toggle("bad", !!msg);
+  box.querySelector(".err").textContent = msg;
+  return !msg;
+}
+Object.keys(rules).forEach(id => $("#"+id).addEventListener("blur", () => check(id)));
+
+$("#form").addEventListener("submit", e => {
+  e.preventDefault();
+  const ok = Object.keys(rules).map(check).every(Boolean);
+  if(!ok) return;
+  const ev = events.find(x => x.id === +$("#event").value);
+  const saved = getRegs();
+  saved.push({name:$("#name").value.trim(), email:$("#email").value.trim(), event:ev.name, date:ev.date});
+  try{ localStorage.setItem("kx-regs", JSON.stringify(saved)); }catch(err){}
+  const s = $("#success");
+  s.style.display = "block";
+  s.textContent = `You're registered for ${ev.name} on ${fmt(ev.date)}. See you at ${ev.venue}!`;
+  e.target.reset();
+  renderRegs();
+});
+
+/* ---------- 5. Saved registrations (Local Storage) ---------- */
+function getRegs(){ try{ return JSON.parse(localStorage.getItem("kx-regs")) || []; }catch(err){ return []; } }
+function renderRegs(){
+  const r = getRegs();
+  $("#regList").innerHTML = r.length
+    ? r.map(x => `<li>${x.name} · ${x.event} · ${fmt(x.date)}</li>`).join("")
+    : `<li>No registrations yet. Fill in the form above to add one.</li>`;
+}
+
+/* ---------- 6. Dark mode and mobile menu ---------- */
+function setTheme(dark){
+  document.body.classList.toggle("dark", dark);
+  $("#themeBtn").textContent = dark ? "Light mode" : "Dark mode";
+  try{ localStorage.setItem("kx-dark", dark ? "1" : "0"); }catch(err){}
+}
+$("#themeBtn").onclick = () => setTheme(!document.body.classList.contains("dark"));
+$("#menuBtn").onclick = () => $("#links").classList.toggle("open");
+$("#links").addEventListener("click", e => { if(e.target.tagName==="A") $("#links").classList.remove("open"); });
+
+/* ---------- Start ---------- */
+try{ setTheme(localStorage.getItem("kx-dark")==="1"); }catch(err){}
+renderChips(); renderCards(); renderRegs();
+</script>
+</body>
+</html>
